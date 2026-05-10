@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不等式を数直線で見る練習</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="hero">
+            <p class="hero-kicker">数学が苦手な高校生向け</p>
+            <h1>不等式は、<span class="hero-accent">色の範囲</span>でつかむ。</h1>
+            <p class="hero-copy">計算で止まったら、まず数直線の色だけ見よう。式を入れると、こたえ・図・手順が同じ画面で確認できます。</p>
+            <ul class="hero-tags">
+                <li>まず答えを見る</li>
+                <li>境目を色で確認</li>
+                <li>手順は短く分解</li>
+            </ul>
+        </header>
+
+        <main class="layout">
+            <section class="card controls-card">
+                <div class="card-head">
+                    <div>
+                        <span class="step-chip"><span class="step-chip-num">1</span> 入力</span>
+                        <h2>式をそのまま入れる</h2>
+                    </div>
+                    <div class="control-group compact">
+                        <label for="mode-select">モード</label>
+                        <select id="mode-select">
+                            <option value="single">まずは1つの式</option>
+                            <option value="and">両方OK（かつ）</option>
+                            <option value="or">どちらかOK（または）</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="hint-box">
+                    <span class="hint-icon" aria-hidden="true">?</span>
+                    <p>左辺・不等号・右辺を教科書どおりに入れてください。<br>x がない場所は、x の前の数を <code>0</code> にします。</p>
+                </div>
+
+                <div class="quick-guide" aria-label="記号の見方">
+                    <div>
+                        <strong>&gt; / &lt;</strong>
+                        <span>境目はふくまない</span>
+                    </div>
+                    <div>
+                        <strong>&ge; / &le;</strong>
+                        <span>境目もふくむ</span>
+                    </div>
+                    <div>
+                        <strong>負で割る</strong>
+                        <span>不等号が反対向き</span>
+                    </div>
+                </div>
+
+                <div class="equations-stack">
+                    <article class="ineq-card" id="eq1-card">
+                        <div class="ineq-header">
+                            <span class="ineq-badge">条件 1</span>
+                            <p id="eq1-preview" class="ineq-preview"></p>
+                        </div>
+                        <div class="eq-input-row">
+                            <div class="expr-side">
+                                <input type="number" id="lcoef1" value="2" step="any" aria-label="条件1の左辺のxの係数">
+                                <span class="term-label">x</span>
+                                <span class="term-sign">+</span>
+                                <input type="number" id="lconst1" value="3" step="any" aria-label="条件1の左辺の定数項">
+                            </div>
+
+                            <select id="op1" aria-label="条件1の不等号">
+                                <option value=">">&gt;</option>
+                                <option value=">=">&ge;</option>
+                                <option value="<">&lt;</option>
+                                <option value="<=">&le;</option>
+                            </select>
+
+                            <div class="expr-side">
+                                <input type="number" id="rcoef1" value="0" step="any" aria-label="条件1の右辺のxの係数">
+                                <span class="term-label">x</span>
+                                <span class="term-sign">+</span>
+                                <input type="number" id="rconst1" value="5" step="any" aria-label="条件1の右辺の定数項">
+                            </div>
+                        </div>
+                    </article>
+
+                    <div id="logical-operator" class="logical-operator hidden">かつ</div>
+
+                    <article class="ineq-card hidden" id="eq2-card">
+                        <div class="ineq-header">
+                            <span class="ineq-badge alt">条件 2</span>
+                            <p id="eq2-preview" class="ineq-preview"></p>
+                        </div>
+                        <div class="eq-input-row">
+                            <div class="expr-side">
+                                <input type="number" id="lcoef2" value="1" step="any" aria-label="条件2の左辺のxの係数">
+                                <span class="term-label">x</span>
+                                <span class="term-sign">+</span>
+                                <input type="number" id="lconst2" value="0" step="any" aria-label="条件2の左辺の定数項">
+                            </div>
+
+                            <select id="op2" aria-label="条件2の不等号">
+                                <option value="<">&lt;</option>
+                                <option value="<=">&le;</option>
+                                <option value=">">&gt;</option>
+                                <option value=">=">&ge;</option>
+                            </select>
+
+                            <div class="expr-side">
+                                <input type="number" id="rcoef2" value="0" step="any" aria-label="条件2の右辺のxの係数">
+                                <span class="term-label">x</span>
+                                <span class="term-sign">+</span>
+                                <input type="number" id="rconst2" value="6" step="any" aria-label="条件2の右辺の定数項">
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="examples-row">
+                    <span class="examples-label">例題で試す</span>
+                    <button type="button" class="example-btn" data-example="single">基本</button>
+                    <button type="button" class="example-btn" data-example="and">かつ</button>
+                    <button type="button" class="example-btn" data-example="or">または</button>
+                </div>
+            </section>
+
+            <section class="card output-card">
+                <div class="card-head">
+                    <div>
+                        <span class="step-chip alt"><span class="step-chip-num">2</span> 確認</span>
+                        <h2>まず答えを見よう</h2>
+                    </div>
+                </div>
+
+                <div class="formula-grid">
+                    <div class="formula-panel accent">
+                        <p class="panel-label">まずここ：x の範囲</p>
+                        <div id="solution-formula" class="math-display"></div>
+                    </div>
+                    <div class="formula-panel">
+                        <p class="panel-label">入力した式</p>
+                        <div id="math-formula" class="math-display"></div>
+                    </div>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-tile">
+                        <p class="summary-label">区間の書き方</p>
+                        <p id="interval-text" class="summary-value"></p>
+                    </div>
+                    <div class="summary-tile">
+                        <p class="summary-label">どんな答え？</p>
+                        <p id="status-text" class="summary-value"></p>
+                    </div>
+                </div>
+
+                <div class="number-line-wrap">
+                    <p class="numberline-caption">青い太線がこたえ</p>
+                    <svg id="number-line" viewBox="0 0 860 320" preserveAspectRatio="xMidYMid meet" aria-label="不等式の数直線"></svg>
+                </div>
+
+                <div id="legend" class="legend"></div>
+
+                <div class="explanation-box">
+                    <div class="explanation-copy">
+                        <h3>ゆっくり説明</h3>
+                        <p id="explanation-text"></p>
+                    </div>
+                    <div id="steps-list" class="steps-list"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="hero-foot">
+            <p><strong>&gt; と &lt;</strong> は白丸、<strong>&ge; と &le;</strong> は塗りつぶし。境目をふくむかどうかだけ落ち着いて見よう。</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
