@@ -27,24 +27,24 @@ const conditionConfigs = [1, 2].map((index) => ({
 
 const svgConfig = {
     width: 860,
-    height: 320,
+    height: 280,
     paddingX: 70,
-    axisY: 220,
-    bandHeight: 40,
-    bandGap: 24,
-    topBandY: 48
+    axisY: 196,
+    bandHeight: 28,
+    bandGap: 18,
+    topBandY: 54
 };
 
 const COLORS = {
-    axis: '#334155',
-    grid: '#e2e8f0',
-    labels: '#1e293b',
-    cond1Fill: 'rgba(20, 184, 166, 0.30)',
-    cond1Stroke: '#0d9488',
-    cond2Fill: 'rgba(225, 29, 72, 0.24)',
-    cond2Stroke: '#e11d48',
-    finalFill: 'rgba(37, 99, 235, 0.24)',
-    finalStroke: '#2563eb'
+    axis: '#475569',
+    grid: '#cbd5e1',
+    labels: '#334155',
+    cond1Fill: 'rgba(15, 118, 110, 0.18)',
+    cond1Stroke: '#0f766e',
+    cond2Fill: 'rgba(180, 83, 9, 0.18)',
+    cond2Stroke: '#b45309',
+    finalFill: 'rgba(15, 23, 42, 0.18)',
+    finalStroke: '#0f172a'
 };
 
 const EXAMPLES = {
@@ -460,22 +460,22 @@ function setToIntervalLatex(solutionSet) {
 
 function classifySolutionSet(solutionSet) {
     if (solutionSet.length === 0) {
-        return 'あてはまる数はありません';
+        return '解なし';
     }
     if (isAllRealsSet(solutionSet)) {
-        return '全部の数があてはまります';
+        return 'すべての実数';
     }
     if (solutionSet.length === 1) {
         const interval = solutionSet[0];
         if (isPointInterval(interval)) {
-            return '境目の1点だけ';
+            return '1点のみ';
         }
         if (interval.left === -Infinity || interval.right === Infinity) {
-            return '片方へずっと続く範囲';
+            return '片側に広がる範囲';
         }
-        return 'ひとつながりの範囲';
+        return '1つの区間';
     }
-    return `${solutionSet.length}つに分かれる範囲`;
+    return `${solutionSet.length}つの区間`;
 }
 
 function solveCondition(condition) {
@@ -496,9 +496,9 @@ function solveCondition(condition) {
             solutionSet,
             boundary: null,
             steps: [
-                { label: 'はじめ', latex: originalLatex },
-                { label: 'xを集める', latex: collectedLatex },
-                { label: '結果', latex: alwaysTrue ? 'x \\in \\mathbb{R}' : '\\varnothing' }
+                { label: '入力', latex: originalLatex },
+                { label: '整理', latex: collectedLatex },
+                { label: '判定', latex: alwaysTrue ? 'x \\in \\mathbb{R}' : '\\varnothing' }
             ]
         };
     }
@@ -517,9 +517,9 @@ function solveCondition(condition) {
         solutionSet,
         boundary,
         steps: [
-            { label: 'はじめ', latex: originalLatex },
-            { label: 'xを集める', latex: collectedLatex },
-            { label: 'こたえ', latex: solutionLatex }
+            { label: '入力', latex: originalLatex },
+            { label: '整理', latex: collectedLatex },
+            { label: '解', latex: solutionLatex }
         ]
     };
 }
@@ -529,28 +529,27 @@ function buildInputText(condition) {
 }
 
 function buildStatusText(mode, solutionSet) {
-    const summary = classifySolutionSet(solutionSet);
     if (mode === 'single') {
-        return summary;
+        return `1条件の解: ${classifySolutionSet(solutionSet)}`;
     }
     if (mode === 'and') {
-        return `両方OKのところ: ${summary}`;
+        return `共通部分の解: ${classifySolutionSet(solutionSet)}`;
     }
-    return `どちらかOKのところ: ${summary}`;
+    return `和集合の解: ${classifySolutionSet(solutionSet)}`;
 }
 
 function buildExplanation(mode, solvedConditions, finalSet) {
     const opening = mode === 'single'
-        ? 'まず左辺と右辺を整理して、x だけの形にします。最後に、その範囲を数直線の青い太線にしています。'
+        ? '左辺と右辺を整理して x の範囲へ直し、その結果をそのまま数直線に反映しています。'
         : mode === 'and'
-            ? '2つの式を別々に x の範囲へ直します。「かつ」は、両方の色が重なるところだけを答えにします。'
-            : '2つの式を別々に x の範囲へ直します。「または」は、どちらか一方でも当てはまるところを全部答えにします。';
+            ? '各条件を先に x の範囲へ直し、その共通部分だけを最終解として残しています。'
+            : '各条件を先に x の範囲へ直し、どちらかを満たす部分を最終解として合わせています。';
 
     const conditionText = solvedConditions
         .map((solved, index) => `条件${index + 1}は ${solved.solutionText}`)
         .join('、');
 
-    return `${opening} ${conditionText}。最終的なこたえは ${setToSolutionText(finalSet)} です。`;
+    return `${opening} ${conditionText}。最終結果は ${setToSolutionText(finalSet)} です。`;
 }
 
 function renderSteps(mode, solvedConditions, finalSet) {
@@ -591,11 +590,11 @@ function renderSteps(mode, solvedConditions, finalSet) {
     if (mode !== 'single') {
         appendSection('まとめ', [
             {
-                label: mode === 'and' ? '両方OK' : 'どちらかOK',
+                label: mode === 'and' ? '共通部分' : '和集合',
                 latex: `${solvedConditions[0].intervalLatex} ${mode === 'and' ? '\\cap' : '\\cup'} ${solvedConditions[1].intervalLatex} = ${setToIntervalLatex(finalSet)}`
             },
             {
-                label: 'こたえ',
+                label: '最終解',
                 latex: setToSolutionLatex(finalSet)
             }
         ]);
@@ -604,14 +603,14 @@ function renderSteps(mode, solvedConditions, finalSet) {
 
 function renderLegend(mode) {
     const items = [
-        { label: '条件1の範囲', className: 'cond1' }
+        { label: '条件 1', className: 'cond1' }
     ];
 
     if (mode !== 'single') {
-        items.push({ label: '条件2の範囲', className: 'cond2' });
+        items.push({ label: '条件 2', className: 'cond2' });
     }
 
-    items.push({ label: '最終のこたえ', className: 'final' });
+    items.push({ label: '最終解', className: 'final' });
 
     elements.legend.innerHTML = items.map((item) => `
         <div class="legend-item">
@@ -767,7 +766,7 @@ function drawEndpoint(svg, x, y, closed, color, radius) {
         r: radius,
         fill: closed ? color : '#ffffff',
         stroke: color,
-        'stroke-width': closed ? 3.5 : 3
+        'stroke-width': closed ? 3 : 2.5
     }));
 }
 
@@ -781,19 +780,17 @@ function drawAxis(svg, plotRange) {
             x1: x,
             y1: svgConfig.topBandY - 12,
             x2: x,
-            y2: svgConfig.axisY + 28,
+            y2: svgConfig.axisY + 24,
             stroke: COLORS.grid,
-            'stroke-width': 1.2,
-            'opacity': 0.6
+            'stroke-width': 1
         }));
 
         svg.appendChild(createSvgElement('text', {
             x,
-            y: svgConfig.axisY + 48,
+            y: svgConfig.axisY + 42,
             'text-anchor': 'middle',
-            'font-size': 15,
-            'font-weight': '500',
-            'font-family': 'M PLUS Rounded 1c, sans-serif',
+            'font-size': 13,
+            'font-family': 'M PLUS 1p, sans-serif',
             fill: COLORS.labels
         })).textContent = formatNumber(tick);
     }
@@ -804,7 +801,7 @@ function drawAxis(svg, plotRange) {
         x2: innerRight,
         y2: svgConfig.axisY,
         stroke: COLORS.axis,
-        'stroke-width': 3,
+        'stroke-width': 2.5,
         'marker-start': 'url(#axis-arrow)',
         'marker-end': 'url(#axis-arrow)'
     }));
@@ -815,11 +812,10 @@ function drawBand(svg, solutionSet, plotRange, options) {
 
     const labelText = createSvgElement('text', {
         x: svgConfig.paddingX,
-        y: y - 14,
+        y: y - 10,
         'text-anchor': 'start',
-        'font-size': 15,
-        'font-weight': 'bold',
-        'font-family': 'M PLUS Rounded 1c, sans-serif',
+        'font-size': 13,
+        'font-family': 'M PLUS 1p, sans-serif',
         fill: COLORS.labels
     });
     labelText.textContent = label;
@@ -839,17 +835,17 @@ function drawBand(svg, solutionSet, plotRange, options) {
             y,
             width,
             height: svgConfig.bandHeight,
-            rx: 14,
+            rx: 12,
             fill,
             stroke,
-            'stroke-width': 2.5
+            'stroke-width': 1.5
         }));
 
         if (interval.left !== -Infinity) {
-            drawEndpoint(svg, x1, y + (svgConfig.bandHeight / 2), interval.leftClosed, stroke, 6.5);
+            drawEndpoint(svg, x1, y + (svgConfig.bandHeight / 2), interval.leftClosed, stroke, 5.5);
         }
         if (interval.right !== Infinity) {
-            drawEndpoint(svg, x2, y + (svgConfig.bandHeight / 2), interval.rightClosed, stroke, 6.5);
+            drawEndpoint(svg, x2, y + (svgConfig.bandHeight / 2), interval.rightClosed, stroke, 5.5);
         }
     });
 }
@@ -858,14 +854,13 @@ function drawFinalSolution(svg, finalSet, plotRange) {
     if (finalSet.length === 0) {
         const noSolution = createSvgElement('text', {
             x: svgConfig.width / 2,
-            y: svgConfig.axisY - 28,
+            y: svgConfig.axisY - 22,
             'text-anchor': 'middle',
-            'font-size': 18,
-            'font-weight': 'bold',
-            'font-family': 'M PLUS Rounded 1c, sans-serif',
+            'font-size': 16,
+            'font-family': 'M PLUS 1p, sans-serif',
             fill: COLORS.finalStroke
         });
-        noSolution.textContent = 'あてはまる数なし';
+        noSolution.textContent = '解なし';
         svg.appendChild(noSolution);
         return;
     }
@@ -875,7 +870,7 @@ function drawFinalSolution(svg, finalSet, plotRange) {
         const x2 = interval.right === Infinity ? svgConfig.width - svgConfig.paddingX : valueToX(interval.right, plotRange);
 
         if (isPointInterval(interval)) {
-            drawEndpoint(svg, x1, svgConfig.axisY, true, COLORS.finalStroke, 9);
+            drawEndpoint(svg, x1, svgConfig.axisY, true, COLORS.finalStroke, 8);
             return;
         }
 
@@ -885,17 +880,17 @@ function drawFinalSolution(svg, finalSet, plotRange) {
             x2,
             y2: svgConfig.axisY,
             stroke: COLORS.finalStroke,
-            'stroke-width': 13,
+            'stroke-width': 10,
             'stroke-linecap': 'round',
             'marker-start': interval.left === -Infinity ? 'url(#final-arrow-start)' : '',
             'marker-end': interval.right === Infinity ? 'url(#final-arrow-end)' : ''
         }));
 
         if (interval.left !== -Infinity) {
-            drawEndpoint(svg, x1, svgConfig.axisY, interval.leftClosed, COLORS.finalStroke, 8.5);
+            drawEndpoint(svg, x1, svgConfig.axisY, interval.leftClosed, COLORS.finalStroke, 7.5);
         }
         if (interval.right !== Infinity) {
-            drawEndpoint(svg, x2, svgConfig.axisY, interval.rightClosed, COLORS.finalStroke, 8.5);
+            drawEndpoint(svg, x2, svgConfig.axisY, interval.rightClosed, COLORS.finalStroke, 7.5);
         }
     });
 }
@@ -908,7 +903,7 @@ function renderNumberLine(mode, solvedConditions, finalSet) {
     drawAxis(elements.svg, plotRange);
 
     drawBand(elements.svg, solvedConditions[0].solutionSet, plotRange, {
-        label: '条件1でOK',
+        label: '条件 1',
         y: svgConfig.topBandY,
         fill: COLORS.cond1Fill,
         stroke: COLORS.cond1Stroke
@@ -916,7 +911,7 @@ function renderNumberLine(mode, solvedConditions, finalSet) {
 
     if (mode !== 'single') {
         drawBand(elements.svg, solvedConditions[1].solutionSet, plotRange, {
-            label: '条件2でOK',
+            label: '条件 2',
             y: svgConfig.topBandY + svgConfig.bandHeight + svgConfig.bandGap,
             fill: COLORS.cond2Fill,
             stroke: COLORS.cond2Stroke
